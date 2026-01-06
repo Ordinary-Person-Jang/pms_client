@@ -3,42 +3,51 @@
     <div class="login-modal">
       <div class="modal-left-box">
         <div class="img-box">
-          <img class='login-logo' :src="logo" style="width: 224px;"/>
+          <img class="login-logo" :src="logo" style="width: 224px" />
         </div>
         <h4 class="span-box">
           <span>환영합니다!</span>
         </h4>
+        <div class="project-select-area">
+          <span class="label">프로젝트</span>
+          <div class="select-box">
+            <select>
+              <option value="">선택</option>
+              <option value="PMS_ADMIN">프로젝트 관리</option>
+              <option value="PMS_DEV">PMS</option>
+            </select>
+          </div>
+        </div>
       </div>
+
       <div class="modal-right-box">
         <div class="right-box-upper">
-          <div class="right-box-header">
-          </div>
+          <div class="right-box-header"></div>
 
           <div class="right-box-content">
             <h2>로그인</h2>
             <h4>사원정보로 로그인</h4>
 
-            <div class='right-box-content-inputbox'>
+            <div class="right-box-content-inputbox">
               <div>
                 <div class="inputbox-left">
                   <p>사번</p>
                 </div>
                 <div class="inputbox-right">
-                  <input type="text" placeholder="사번을 입력해주세요"/>
+                  <input type="text" placeholder="사번을 입력해주세요" />
                 </div>
-
               </div>
               <div>
                 <div class="inputbox-left">
                   <p>비밀번호</p>
                 </div>
-                <div class='inputbox-right'>
+                <div class="inputbox-right">
                   <input type="password" placeholder="비밀번호를 입력해주세요" />
                 </div>
               </div>
             </div>
 
-            <button >로그인</button>
+            <button>로그인</button>
 
             <h4>소셜 계정으로 로그인</h4>
             <!--
@@ -74,13 +83,13 @@ import { defineStore } from 'pinia'
 const logo = ''
 const store = defineStore
 const props = defineProps({
-  modalName : {
+  modalName: {
     type: String,
-    default: 'test'
-  }
+    default: 'test',
+  },
 })
 </script>
 
 <style lang="scss">
-@import "@/styles/common/LoginPage.scss";
+@import '@/styles/common/LoginPage.scss';
 </style>
