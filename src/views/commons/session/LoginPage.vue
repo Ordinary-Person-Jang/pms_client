@@ -10,8 +10,8 @@
         </h4>
         <div class="project-select-area">
           <span class="label">프로젝트</span>
-          <div class="select-box">
-            <select>
+          <div class="select-box" >
+            <select v-model="state.loginInfo.pjtId">
               <option value="">선택</option>
               <option value="PMS_ADMIN">프로젝트 관리</option>
               <option value="PMS_DEV">PMS</option>
@@ -34,7 +34,7 @@
                   <p>사번</p>
                 </div>
                 <div class="inputbox-right">
-                  <input type="text" placeholder="사번을 입력해주세요" />
+                  <input type="text" v-model="state.loginInfo.empNo" placeholder="사번을 입력해주세요" />
                 </div>
               </div>
               <div>
@@ -42,7 +42,7 @@
                   <p>비밀번호</p>
                 </div>
                 <div class="inputbox-right">
-                  <input type="password" placeholder="비밀번호를 입력해주세요" />
+                  <input type="password" v-model="state.loginInfo.password" placeholder="비밀번호를 입력해주세요" />
                 </div>
               </div>
             </div>
@@ -81,6 +81,9 @@
 <script setup lang="ts">
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
+import { type LoginInfo, loginRequest, sessionCheck } from '@/script/utils/session/SessionUtils'
+import router from '@/router'
+
 const logo = ''
 const store = defineStore
 const props = defineProps({
@@ -89,13 +92,34 @@ const props = defineProps({
     default: 'test',
   },
 })
-const state = reactive({
-  loginInfo: {
+const state = reactive<LoginInfo>({
     empNo: '',
     pjtId: '',
     password: ''
-  }
 })
+const loginCheck = async () => {
+  const loginInfo = {
+    empNo: state.empNo,
+    pjtId: state.pjtId,
+    password: state.password
+  }
+
+  if(loginInfo.empNo && loginInfo.password && loginInfo.pjtId) {
+    await loginRequest(loginInfo)
+      .then(res => {
+        if(sessionCheck()){
+          router.push('/')
+        }else{
+          alert("사번 및 비밀번호를 확인해 주세요")
+        }
+      }).catch(e=> {
+        alert("사번 및 비밀번호를 확인해 주세요")
+        console.error(e)
+      })
+  } else {
+    alert('사번 및 비밀번호를 입력해 주세요')
+  }
+}
 </script>
 
 <style lang="scss">

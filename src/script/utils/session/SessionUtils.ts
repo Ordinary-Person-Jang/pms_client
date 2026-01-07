@@ -4,18 +4,24 @@ import Api from '@/script/utils/session/AxiosInterceptor'
 import router from '@/router'
 import { useUserStore } from '@/stores/userStore'
 
+export interface LoginInfo {
+  empNo:string,
+  pjtId:string,
+  password:string
+}
+
 export function sessionCheck(){
   const cookieStr :string = Cookies.get(SESSION_CONSTANTS.TOKEN_KEY) || SESSION_CONSTANTS.DEFAULT_TOKEN
   return cookieStr.startsWith('Bearer ') ? true : false
 }
 
-export async function loginRequest(post :{empNo:string, pjtId:string, Password:string}) {
+export async function loginRequest(post :LoginInfo) {
   const userStore = useUserStore();
 
   return await Api.post('/login', {
     id : post.empNo,
     pjtId : post.pjtId,
-    password : post.Password
+    password : post.password
   })
     .then(res => {
       const { headers, data } = res
