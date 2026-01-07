@@ -10,8 +10,8 @@
         </h4>
         <div class="project-select-area">
           <span class="label">프로젝트</span>
-          <div class="select-box" >
-            <select v-model="state.loginInfo.pjtId">
+          <div class="select-box">
+            <select ref="pjtIdRef" v-model="state.pjtId" @keydown.tab.prevent="empNoRef?.focus()">
               <option value="">선택</option>
               <option value="PMS_ADMIN">프로젝트 관리</option>
               <option value="PMS_DEV">PMS</option>
@@ -34,7 +34,14 @@
                   <p>사번</p>
                 </div>
                 <div class="inputbox-right">
-                  <input type="text" v-model="state.loginInfo.empNo" placeholder="사번을 입력해주세요" />
+                  <input
+                    type="text"
+                    ref="empNoRef"
+                    v-model="state.empNo"
+                    placeholder="사번을 입력해주세요"
+                    @keydown.enter="loginCheck"
+                    @keydown.tab.prevent="passwordRef?.focus()"
+                  />
                 </div>
               </div>
               <div>
@@ -42,12 +49,26 @@
                   <p>비밀번호</p>
                 </div>
                 <div class="inputbox-right">
-                  <input type="password" v-model="state.loginInfo.password" placeholder="비밀번호를 입력해주세요" />
+                  <input
+                    type="password"
+                    ref="passwordRef"
+                    v-model="state.password"
+                    placeholder="비밀번호를 입력해주세요"
+                    @keydown.enter="loginCheck"
+                    @keydown.tab.prevent="submitRef?.focus()"
+                  />
                 </div>
               </div>
             </div>
 
-            <button>로그인</button>
+            <button
+              ref="submitRef"
+              @click="loginCheck"
+              @keydown.enter="loginCheck"
+              @keydown.tab.prevent="pjtIdRef?.focus()"
+            >
+              로그인
+            </button>
 
             <h4>소셜 계정으로 로그인</h4>
             <!--
@@ -79,13 +100,13 @@
 </template>
 
 <script setup lang="ts">
-import { defineStore } from 'pinia'
-import { reactive } from 'vue'
+import { useUserStore } from '@/stores/userStore'
+import { reactive, ref } from 'vue'
 import { type LoginInfo, loginRequest, sessionCheck } from '@/script/utils/session/SessionUtils'
 import router from '@/router'
 
 const logo = ''
-const store = defineStore
+const store = useUserStore();
 const props = defineProps({
   modalName: {
     type: String,
@@ -93,29 +114,31 @@ const props = defineProps({
   },
 })
 const state = reactive<LoginInfo>({
-    empNo: '',
-    pjtId: '',
-    password: ''
+  empNo: '',
+  pjtId: '',
+  password: '',
 })
-const loginCheck = async () => {
-  const loginInfo = {
-    empNo: state.empNo,
-    pjtId: state.pjtId,
-    password: state.password
-  }
 
-  if(loginInfo.empNo && loginInfo.password && loginInfo.pjtId) {
-    await loginRequest(loginInfo)
-      .then(res => {
-        if(sessionCheck()){
-          router.push('/')
-        }else{
-          alert("사번 및 비밀번호를 확인해 주세요")
-        }
-      }).catch(e=> {
-        alert("사번 및 비밀번호를 확인해 주세요")
-        console.error(e)
-      })
+const empNoRef = ref<HTMLInputElement | null>(null)
+const passwordRef = ref<HTMLInputElement | null>(null)
+const pjtIdRef = ref<HTMLSelectElement | null>(null)
+const submitRef = ref<HTMLButtonElement | null>(null)
+
+const loginCheck = async () => {
+  if (state.empNo && state.password && state.pjtId) {
+
+    try {
+      await loginRequest(state);
+
+      if (sessionCheck()) {
+        void router.push('/')
+      } else {
+        alert('사번 및 비밀번호를 확인해 주세요')
+      }
+    } catch (e) {
+      alert('사번 및 비밀번호를 확인해 주세요')
+      console.error(e)
+    }
   } else {
     alert('사번 및 비밀번호를 입력해 주세요')
   }
