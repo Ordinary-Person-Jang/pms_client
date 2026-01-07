@@ -80,6 +80,7 @@
 
 <script setup lang="ts">
 import { defineStore } from 'pinia'
+import { reactive } from 'vue'
 const logo = ''
 const store = defineStore
 const props = defineProps({
@@ -88,8 +89,15 @@ const props = defineProps({
     default: 'test',
   },
 })
+const state = reactive({
+  loginInfo: {
+    empNo: '',
+    pjtId: '',
+    password: ''
+  }
+})
 </script>
 
 <style lang="scss">
-@import '@/styles/common/LoginPage.scss';
+@use '@/styles/common/LoginPage.scss';
 </style>

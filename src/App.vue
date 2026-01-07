@@ -11,5 +11,5 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <style lang="scss">
-@import "@/styles/common/component.scss";
+@use "@/styles/common/component.scss";
 </style>
