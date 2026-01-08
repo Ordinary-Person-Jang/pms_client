@@ -14,7 +14,7 @@ export const Api = axios.create({
 Api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   if(!config.headers) return config;
 
-  const token :string = Cookies.get(SESSION_CONSTANTS.TOKEN_KEY) || SESSION_CONSTANTS.DEFAULT_TOKEN;
+  const token :string = Cookies.get(SESSION_CONSTANTS.COOKIE_TOKEN_KEY) || SESSION_CONSTANTS.DEFAULT_TOKEN;
 
   if(config.headers) {
     config.headers.set('Authorization', token)
@@ -36,9 +36,9 @@ Api.interceptors.response.use(
   (response: AxiosResponse) => {
     const isToken = sessionCheck()
     if(isToken){
-      const token :string = Cookies.get(SESSION_CONSTANTS.TOKEN_KEY) as string;
+      const token :string = Cookies.get(SESSION_CONSTANTS.COOKIE_TOKEN_KEY) as string;
       const expiresTime :Date =new Date(new Date().getTime() + 30 * 60 * 1000);
-      Cookies.set(SESSION_CONSTANTS.TOKEN_KEY, token, {
+      Cookies.set(SESSION_CONSTANTS.COOKIE_TOKEN_KEY, token, {
         expires: expiresTime,
         path: '/'
       })
@@ -54,7 +54,7 @@ Api.interceptors.response.use(
 
         alert('세션이 만료되었습니다. 다시 로그인해주세요.');
         userStore.clearUserInfo();
-        Cookies.remove(SESSION_CONSTANTS.TOKEN_KEY);
+        Cookies.remove(SESSION_CONSTANTS.COOKIE_TOKEN_KEY);
         router.push(SESSION_CONSTANTS.LOGIN_PAGE_URL);
         return Promise.reject(new Error(SESSION_CONSTANTS.EXPIRED_TOKEN));
       }

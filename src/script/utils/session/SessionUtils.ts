@@ -11,41 +11,51 @@ export interface LoginInfo {
 }
 
 export function sessionCheck(){
-  const cookieStr :string = Cookies.get(SESSION_CONSTANTS.TOKEN_KEY) || SESSION_CONSTANTS.DEFAULT_TOKEN
-  return cookieStr.startsWith('Bearer ') ? true : false
+  const cookieStr :string = Cookies.get(SESSION_CONSTANTS.COOKIE_TOKEN_KEY) || SESSION_CONSTANTS.DEFAULT_TOKEN
+  return cookieStr.startsWith('Bearer ')
 }
 
-export async function loginRequest(post :LoginInfo) {
+export async function loginRequest(post :LoginInfo):Promise<boolean> {
   const userStore = useUserStore();
 
-  return await Api.post('/login', {
-    id : post.empNo,
-    pjtId : post.pjtId,
-    password : post.password
-  })
-    .then(res => {
-      const { headers, data } = res
-      if(data != null){
-        const token = headers['Authorization'];
+  try {
+    const res = await Api.post('/login', {
+      id : post.empNo,
+      pjtId : post.pjtId,
+      password : post.password
+    })
 
-        userStore.setUserInfo(data);
+    const { headers, data } = res
 
-        const expiresTime :Date = new Date(new Date().getTime() + 30 * 60 * 1000);
+    if(!data){
+      throw new Error('INVALID_CREDENTIALS')
+    }
 
-        Cookies.set('Authorization', token, {
-          expires : expiresTime,
-          path: '/'
-        })
+    const token = headers[SESSION_CONSTANTS.RESPONSE_AUTH_HEADER]
 
-        return headers
-      } else {
-        alert("사번 및 비밀번호를 확인해 주세요")
-      }
-    }).catch(e => {console.error(e)})
+    if(!token){
+      throw new Error('TOKEN_NOT_FOUND')
+    }
+
+    userStore.setUserInfo(data)
+
+    const expiresTime :Date = new Date(new Date().getTime() + 30 * 60 * 1000);
+
+    Cookies.set(SESSION_CONSTANTS.COOKIE_TOKEN_KEY, token, {
+      expires: expiresTime,
+      path: '/',
+    })
+
+    return true
+  } catch (e) {
+    console.error(e)
+    return false
+  }
 }
+
 export async function logoutProcess(){
   const userStore = useUserStore();
   userStore.clearUserInfo();
-  Cookies.remove(SESSION_CONSTANTS.TOKEN_KEY);
+  Cookies.remove(SESSION_CONSTANTS.COOKIE_TOKEN_KEY);
   router.push(SESSION_CONSTANTS.LOGIN_PAGE_URL);
 }
