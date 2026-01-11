@@ -22,7 +22,7 @@ Api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     config.headers.set('Content-Type', 'application/json')
   }
 
-  config.withCredentials = true
+  config.withCredentials = false
 
   return config
 }, (error) => {

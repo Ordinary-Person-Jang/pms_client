@@ -34,13 +34,13 @@ router.beforeEach((to, from, next) =>{
   const isLoggedIn: boolean = sessionCheck()
   const isAuthRequired = to.matched.some(record => record.meta.requiresAuth)
 
-  if (isAuthRequired && !isLoggedIn) {
-    next({ path: SESSION_CONSTANTS.LOGIN_PAGE_URL })
+  if ((to.path !== SESSION_CONSTANTS.LOGIN_PAGE_URL && !isLoggedIn) || isAuthRequired) {
+    return next({ path: SESSION_CONSTANTS.LOGIN_PAGE_URL })
   }
   if (to.path === SESSION_CONSTANTS.LOGIN_PAGE_URL && isLoggedIn) {
-    return { path: '/' }
+    return next({ path: '/'})
   }
-  return true;
+  return next();
 })
 
 export default router
