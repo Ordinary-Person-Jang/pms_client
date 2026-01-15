@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginView from '@/views/commons/session/LoginPage.vue'
-import { SESSION_CONSTANTS } from '@/constants/session/session.ts'
+import { SESSION_CONSTANTS } from '@/constants/session/Session.ts'
 import { sessionCheck } from '@/script/utils/session/SessionUtils.ts'
 
 const router = createRouter({

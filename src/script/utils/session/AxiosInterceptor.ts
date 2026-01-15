@@ -1,11 +1,11 @@
 import axios from 'axios'
 import type { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
-import router from '@/router'
 import Cookies from 'js-cookie';
 
-import { SESSION_CONSTANTS } from '@/constants/session/session'
+import { SESSION_CONSTANTS } from '@/constants/session/Session.ts'
 import { sessionCheck } from '@/script/utils/session/SessionUtils.ts'
 import { useUserStore } from '@/stores/userStore'
+import { isEmpty } from 'lodash'
 
 
 export const Api = axios.create({
@@ -50,30 +50,32 @@ Api.interceptors.response.use(
   },
   (error: AxiosError) => {
     if(error.response){
-      const { status, data } = error.response
+      const { status, data } = error.response as { status: number, data: { code?:string, message?:string }}
+
+      const isProxyError =
+        typeof data === 'object' && !isEmpty(data.code) && data.code === 'PROXY_NETWORK_ERROR'
+      if (status === 500 && isProxyError) {
+        return Promise.reject({ code: data.code })
+      }
 
       if (status === 403) {
         const userStore = useUserStore();
 
-        alert('세션이 만료되었습니다. 다시 로그인해주세요.');
         userStore.clearUserInfo();
         Cookies.remove(SESSION_CONSTANTS.COOKIE_TOKEN_KEY);
         // router.push(SESSION_CONSTANTS.LOGIN_PAGE_URL);
-        return Promise.reject(new Error({ type: 'AUTH_EXPIRED', message: '세션 만료' }));
+        return Promise.reject({ code: 'AUTH_EXPIRED' })
       }
 
       const message = (data as { message? :string })?.message ?? '알 수 없는 에러가 발생했습니다.';
-      return Promise.reject(new Error({ type: 'BUSINESS_ERROR', message }));
+      return Promise.reject({ code: 'BUSINESS_ERROR', message })
     }
 
     else if (error.request) {
-      return Promise.reject({
-        type: 'NETWORK_ERROR',
-        message: '서버와 연결할 수 없습니다. 네트워크 상태를 확인하거나 잠시 후 다시 시도해주세요.'
-      });
+      return Promise.reject({ code: 'NETWORK_ERROR' })
     }
 
-    return Promise.reject({ type: 'UNKNOWN_ERROR', message: '알 수 없는 에러가 발생했습니다.' });
+    return Promise.reject({ code: 'UNKNOWN_ERROR', message: '알 수 없는 에러가 발생했습니다.' })
   }
 );
 export default Api;

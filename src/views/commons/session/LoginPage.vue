@@ -102,7 +102,7 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores/userStore'
 import { reactive, ref } from 'vue'
-import { type LoginInfo, loginRequest, sessionCheck } from '@/script/utils/session/SessionUtils'
+import { type LoginInfo, loginRequest } from '@/script/utils/session/SessionUtils'
 import router from '@/router'
 
 const logo = ''
