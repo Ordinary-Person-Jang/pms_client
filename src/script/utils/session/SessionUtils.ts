@@ -18,7 +18,7 @@ export function sessionCheck(){
 export async function loginRequest(post :LoginInfo):Promise<boolean> {
   const userStore = useUserStore();
 
-  try {
+  // try {
     const res = await Api.post('/login', {
       id : post.empNo,
       pjtId : post.pjtId,
@@ -47,10 +47,12 @@ export async function loginRequest(post :LoginInfo):Promise<boolean> {
     })
 
     return true
-  } catch (e) {
-    console.error(e)
-    return false
-  }
+  // } catch (e) {
+  //   // console.error(new Error({type: 'NETWORK_ERROR',
+  //   //   message: '서버와 연결할 수 없습니다. 네트워크 상태를 확인하거나 잠시 후 다시 시도해주세요.'}))
+  //   console.error(e)
+  //   return false
+  // }``
 }
 
 export async function logoutProcess(){

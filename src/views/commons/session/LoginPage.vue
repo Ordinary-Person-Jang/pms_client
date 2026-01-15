@@ -127,14 +127,8 @@ const submitRef = ref<HTMLButtonElement | null>(null)
 const loginCheck = async () => {
   if (state.empNo && state.password && state.pjtId) {
 
-    try {
-      await loginRequest(state)
-      void router.push('/')
-
-    } catch (e) {
-      alert('사번 및 비밀번호를 확인해 주세요')
-      console.error(e)
-    }
+    const result = await loginRequest(state);
+    if(result) void router.push('/')
   } else {
     alert('사번 및 비밀번호를 입력해 주세요')
   }
