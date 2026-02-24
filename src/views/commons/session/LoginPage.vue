@@ -104,7 +104,10 @@ import { useUserStore } from '@/stores/userStore'
 import { reactive, ref } from 'vue'
 import { type LoginInfo, loginRequest } from '@/script/utils/session/SessionUtils'
 import router from '@/router'
+import { z } from 'zod'
 
+import { useDialog } from '@/script/utils/commons/useDialog.ts'
+const { alert } = useDialog()
 const logo = ''
 const store = useUserStore();
 const props = defineProps({
@@ -112,6 +115,11 @@ const props = defineProps({
     type: String,
     default: 'test',
   },
+})
+const stateSchema= z.object({
+  empNo: z.string().min(1, '사번을 입력해 주세요'),
+  pjtId: z.string().min(1, '프로젝트를 선택해 주세요'),
+  password: z.string().min(1, '비밀번호를 입력해 주세요'),
 })
 const state = reactive<LoginInfo>({
   empNo: '',
@@ -125,13 +133,16 @@ const pjtIdRef = ref<HTMLSelectElement | null>(null)
 const submitRef = ref<HTMLButtonElement | null>(null)
 
 const loginCheck = async () => {
-  if (state.empNo && state.password && state.pjtId) {
+  const validate = stateSchema.safeParse({ ...state })
 
-    const result = await loginRequest(state);
-    if(result) void router.push('/')
-  } else {
-    alert('사번 및 비밀번호를 입력해 주세요')
+  if(!validate.success){
+    const issue = validate.error.issues[0]
+    alert(issue? issue.message : '입력값을 확인해 주세요')
+    return;
   }
+
+  const result = await loginRequest(validate.data)
+  if(result) void router.push('/')
 }
 </script>
 
